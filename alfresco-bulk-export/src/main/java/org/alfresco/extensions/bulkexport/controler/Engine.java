@@ -81,8 +81,7 @@ public class Engine {
         this.useNodeCache = useNodeCache;
         this.nbOfThreads = nbOfThreads;
         this.exportChunkSize = exportChunkSize;
-
-        threadPool = Executors.newFixedThreadPool(nbOfThreads);
+        threadPool = Executors.newFixedThreadPool(this.nbOfThreads);
     }
 
     /**

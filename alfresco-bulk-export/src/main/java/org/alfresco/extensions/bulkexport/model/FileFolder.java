@@ -68,7 +68,12 @@ public class FileFolder
         this.basePath = basePath;
         this.scapeExported = scapeExported;
         this.ui = ui;
-    }        
+    }
+
+    public FileFolder(String basePath, boolean scapeExported) {
+        this.scapeExported = scapeExported;
+        this.basePath = basePath;
+    }
     
     public String basePath()
     {

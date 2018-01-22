@@ -63,6 +63,10 @@ public class Engine {
     /** How many Nodes are exported per process*/
     private int exportChunkSize;
 
+    private List<Future<?>> futures = new ArrayList<>();
+
+    private ExecutorService threadPool;
+
     /**
      * Engine Default Builder
      *
@@ -77,6 +81,8 @@ public class Engine {
         this.useNodeCache = useNodeCache;
         this.nbOfThreads = nbOfThreads;
         this.exportChunkSize = exportChunkSize;
+
+        threadPool = Executors.newFixedThreadPool(nbOfThreads);
     }
 
     /**
@@ -96,6 +102,10 @@ public class Engine {
             exportNodes(allNodes);
         }
         log.debug("execute (noderef) finished");
+    }
+
+    public void interrupt() {
+        cancelExport();
     }
 
     private List<NodeRef> getNodesToExport(NodeRef rootNode) throws Exception {
@@ -184,8 +194,6 @@ public class Engine {
      * @param nodesToExport
      */
     private void exportNodes(final List<NodeRef> nodesToExport) throws InterruptedException, ExecutionException {
-        ExecutorService threadPool = Executors.newFixedThreadPool(nbOfThreads);
-        List<Future<?>> futures = new ArrayList<>();
 
         int previousLowerLimitNodeNumber = 0;
         int noOfTasks = new Double(Math.ceil(nodesToExport.size() / this.exportChunkSize)).intValue();
@@ -206,10 +214,16 @@ public class Engine {
 
         boolean exportTerminated = false;
 
-        for (Future<?> future : futures) {
-            exportTerminated &= future.isDone();
-        }
+    }
 
+    private void cancelExport() {
+        for (Future<?> future : futures) {
+            if (!future.isCancelled()) {
+                future.cancel(true);
+            }
+        }
+        threadPool.shutdown();
+        log.info("Interrupted thread pool, canceled " + futures.size() + " tasks");
     }
 
     private int calculateNextLowerLimitNodeNumber(int previousLowerLimitNodeNumber, int upperLimitNodeNumber) {

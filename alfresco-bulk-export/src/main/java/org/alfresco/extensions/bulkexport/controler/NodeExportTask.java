@@ -183,10 +183,6 @@ public class NodeExportTask implements Callable<String> {
         final int NODES_TO_PROCESS = 100;
         try {
             for (NodeRef nodeRef : nodesToExport) {
-                if (Thread.currentThread().isInterrupted()) {
-                    log.error(Thread.currentThread().getName() + " interrupted");
-                    throw new InterruptedException();
-                }
                 logCount--;
                 if (this.dao.isFolder(nodeRef)) {
                     this.createFolder(nodeRef);
@@ -201,8 +197,8 @@ public class NodeExportTask implements Callable<String> {
                     log.info("Task " + taskNumber + " has remaining nodes to process " + logCount);
                 }
             }
-        } catch (Exception e) {
-            log.error(e);
+        } catch (InterruptedException e) {
+            log.info(Thread.currentThread().getName() + " interrupted");
         }
         AuthenticationUtil.clearCurrentSecurityContext();
         return "Task " + taskNumber + " is finished";

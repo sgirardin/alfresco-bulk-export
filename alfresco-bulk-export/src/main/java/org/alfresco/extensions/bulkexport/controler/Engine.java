@@ -195,7 +195,7 @@ public class Engine {
     private void exportNodes(final List<NodeRef> nodesToExport) throws InterruptedException, ExecutionException {
 
         int previousLowerLimitNodeNumber = 0;
-        int noOfTasks = new Double(Math.ceil(nodesToExport.size() / this.exportChunkSize)).intValue();
+        int noOfTasks = new Double(Math.ceil((double) nodesToExport.size() / (double) this.exportChunkSize)).intValue();
 
         log.info("Number of tasks: " + noOfTasks);
 
